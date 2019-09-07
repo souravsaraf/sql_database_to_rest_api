@@ -1,0 +1,22 @@
+{
+	"defaultSeverity": "error",
+	"extends": [
+		"tslint:recommended"
+	],
+	"jsRules": {},
+	"rules": {
+		"variable-name": false,
+		"prefer-const": false,
+		"no-console": false,
+		"one-line": false,
+		"prefer-for-of": false,
+		"brace-style": [
+			true,
+			"allman",
+			{
+				"allowSingleLine": true
+			}
+		]
+	},
+	"rulesDirectory": []
+}

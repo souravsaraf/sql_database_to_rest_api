@@ -1,0 +1,23 @@
+{
+    "schema_name": "shringar_dev",
+    "table_info": [
+        {
+            "table_name": "product",
+            "column_info": [
+                {
+                    "column_name": "id",
+                    "type": "int"
+                }
+            ]
+        },
+        {
+            "table_name": "order",
+            "column_info": [
+                {
+                    "column_name": "id",
+                    "type": "int"
+                }
+            ]
+        }
+    ]
+}
