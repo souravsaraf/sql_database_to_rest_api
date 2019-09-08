@@ -7,6 +7,10 @@
                 {
                     "column_name": "id",
                     "type": "int"
+                },
+                {
+                    "column_name": "description",
+                    "type": "string"
                 }
             ]
         },

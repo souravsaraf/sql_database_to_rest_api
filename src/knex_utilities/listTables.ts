@@ -28,8 +28,18 @@ export default function listTables(knex: Knex, schema_name: string)
             query = "SELECT name AS table_name FROM sqlite_master WHERE type='table'";
             break;
     }
-    return knex.raw(query, bindings).then((results) =>
+    return new Promise<string[]>((resolve, reject) =>
     {
-        return results.rows.map((row: any) => row.table_name);
+        try
+        {
+            knex.raw(query, bindings).then((results) =>
+            {
+                // console.log("Result from listTables : ");
+                resolve((results.rows.map((row: any) => row.table_name)) as string[]);
+            });
+        } catch (error)
+        {
+            reject("error in function listTables" + error);
+        }
     });
 }

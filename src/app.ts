@@ -1,6 +1,7 @@
 import bodyParser = require("body-parser"); // Include body-parser
 import express = require("express"); // Include express
-import generateRouterPromise from "./api/routes/tableRouter";
+import { Router } from "express";
+import generatedRouterPromise from "./api/routes/tableRouter";
 
 const app = express(); // This line simply puts Express in a variable called 'app'
 app.use(bodyParser.urlencoded({ extended: true })); // Configure body-parser settings//
@@ -22,18 +23,22 @@ app.get("/", (req: express.Request, res: express.Response) =>
   res.send("Web server running");
 });
 
-generateRouterPromise.then((gen_router: any) =>
+console.log("generic router started");
+
+generatedRouterPromise.then((generatedRouter: Router) =>
 {
-  app.use("/api/v1/", gen_router);
+  console.log("generatedRouterPromise resolved");
+  app.use("/api/v1/", generatedRouter);
+  app.listen(port, (err: express.Errback) =>
+  {
+    if (err)
+    {
+      return console.error("App listen failed with : ", err);
+    }
+    return console.log("server is listening on " + port);
+  });
 },
-  (err: any) => { console.log(err); }
+  (err: any) => { console.log("generatedRouterPromise rejected with : ", err); },
 );
 
-app.listen(port, (err: express.Errback) =>
-{
-  if (err)
-  {
-    return console.error(err);
-  }
-  return console.log("server is listening on " + port);
-});
+console.log("generic router finished");
