@@ -8,9 +8,10 @@ let current_table = "product";
 // returns a json array of entities with or without search criteria.
 router.get(`/${current_table}`, (req, res) =>
 {
+    console.log(req.query);
     if (req.query)
     {
-        res.send({ msg: `Get ${current_table}s with criteria ${req.query}` });
+        res.send({ msg: `Get ${current_table}s with criteria ${JSON.stringify(req.query)}` });
     }
     else
     {
@@ -31,7 +32,8 @@ router.get(`/${current_table}/:id`, (req, res) =>
 router.post(`/${current_table}`, (req, res) =>
 {
     let body = req.body;
-    res.send({ msg: `Insert the entity json : \n${body}\ninto ${current_table} table` });
+    let msg: string = `Insert the entity json : \n${JSON.stringify(body)}\ninto ${current_table} table`;
+    res.send(msg);
 });
 
 // PUT /entitiy/:id
@@ -40,7 +42,8 @@ router.put(`/${current_table}/:id`, (req, res) =>
 {
     let body = req.body;
     let id = req.params.id;
-    res.send({ msg: `Update the entity ${id} with attributes from the json : \n${body}` });
+    let msg: string = `Update the entity ${id} with attributes from the json : \n${JSON.stringify(body)}`;
+    res.send(msg);
 });
 
 // DELETE /entitiy/:id

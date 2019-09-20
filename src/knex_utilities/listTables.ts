@@ -39,7 +39,7 @@ export default function listTables(knex: Knex, schema_name: string)
             });
         } catch (error)
         {
-            reject("error in function listTables" + error);
+            reject("Error occured in function listTables : " + error);
         }
     });
 }

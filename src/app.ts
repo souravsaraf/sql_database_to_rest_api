@@ -1,7 +1,7 @@
 import bodyParser = require("body-parser"); // Include body-parser
 import express = require("express"); // Include express
 import { Router } from "express";
-import generatedRouterPromise from "./api/routes/tableRouter";
+import generatedRouterPromise from "./generateTableRouters";
 
 const app = express(); // This line simply puts Express in a variable called 'app'
 app.use(bodyParser.urlencoded({ extended: true })); // Configure body-parser settings//
