@@ -5,6 +5,7 @@
 	],
 	"jsRules": {},
 	"rules": {
+		"only-arrow-functions": false,
 		"variable-name": false,
 		"prefer-const": false,
 		"no-console": false,

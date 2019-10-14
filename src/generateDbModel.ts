@@ -1,31 +1,12 @@
-import express = require("express"); // Include express
-import * as fs from "fs";
-import Knex from "knex";
-import * as path from "path";
 import apis_to_generate from "./config/apis_to_generate.json";
-import db_connection from "./config/db_connection.json";
+import knex from "./db_Connection";
+import * as _ from "lodash";
 import get_Tables_From_DB_Async from "./knex_utilities/listTables";
-import productRouter from "./routes/product";
 
-/*
-------------------------------------------  *  ------------------------------------
-
-This file creates api's (express routers) for CRUD operations on database tables.
-The config file "db_connection.json" contains the database connection details.
-It will create a router for each table.
-Another config file "apis_to_generate.json" restricts the api to certain tables and columns.
-
-------------------------------------------  *  ------------------------------------
-*/
-
-/*
-    NO ORACLE SUPPORT : Please note that at the moment , this package does not support Oracle,
-    coz I wasn't able to get knex working with Oracle.
-*/
+// This file creates a model for the underlying database which will be used to generate the apis.
 
 // Connect to database and get all schema information
 let appData: { [k: string]: any } = {};
-const knex: Knex = Knex(db_connection);
 
 // our api schema
 let schema_name = apis_to_generate.schema_name || "public";
@@ -33,10 +14,10 @@ console.log(`Schema name is : ${schema_name}`);
 appData.schema_name = schema_name;
 
 // create and export generated express routers
-let router_promise = generate_All_Routers_Async();
-export = router_promise;
+let dbModelPromise = generate_DB_Model_Async();
+export = dbModelPromise;
 
-async function generate_All_Routers_Async()
+async function generate_DB_Model_Async()
 {
     try
     {
@@ -48,7 +29,7 @@ async function generate_All_Routers_Async()
         let tablesRequiredByUser: string[] = apis_to_generate.table_info.map((ti) => ti.table_name);
         console.log(`List of tables whose Api is required by User : ${tablesRequiredByUser.sort().join(", ")}`);
 
-        let tablesForApi: string[] = tablesInDb.filter((t) => tablesRequiredByUser.includes(t));
+        let tablesForApi: string[] = _.intersection(tablesInDb, tablesRequiredByUser);
         console.log(`List of tables whose Api will be created : ${tablesForApi.sort().join(", ")}`);
 
         tablesForApi.map((ta: string) =>
@@ -61,10 +42,7 @@ async function generate_All_Routers_Async()
         // Get all column info for all the tables
         let results = await Promise.all(tablesForApi.map((t: string) => get_Columns_For_Table_Async(t)));
         console.log(`\nDatabase model generated = \n${JSON.stringify(appData, null, 4)}`);
-        fs.writeFileSync(path.join(__dirname, "config", "app_generated_models.json"), JSON.stringify(appData, null, 4));
-
-        let routers = await create_Routers_Promise();
-        return routers;
+        return appData;
     } catch (error)
     {
         console.error("Error occured in function createRoutersAsync : " + error);
@@ -84,7 +62,7 @@ async function get_Columns_For_Table_Async(current_table: string)
         let columnsRequiredByUser = (apis_to_generate.table_info.find((val) => val.table_name === current_table) as { [k: string]: any }).columns;
         console.log(`For table ${current_table} , List of columns required by user : ${columnsRequiredByUser.sort().join(", ")}`);
 
-        let columnsForApi: string[] = columnsInDB.filter((t) => columnsRequiredByUser.includes(t));
+        let columnsForApi: string[] = _.intersection(columnsInDB, columnsRequiredByUser);
         console.log(`For table ${current_table} , List of columns filters in the api : ${columnsForApi.sort().join(", ")}`);
 
         // Primary key column MUST be a part of the api
@@ -117,35 +95,4 @@ async function get_Columns_For_Table_Async(current_table: string)
         console.log("error in get_Columns_For_Table_Async : " + error.toString());
         throw (error);
     }
-}
-
-function create_Routers_Promise()
-{
-    // let tables: string[] = ["order"];
-    // const router: express.Router = express.Router();
-
-    // // Add a 'get' method to express router for our test route
-    // // GET host:port/api/v1
-    // router.get(`/`, (req, res) =>
-    // {
-    //     res.send({ msg: `add /entity in the url to perform CRUD operations on that entity` });
-    // });
-
-    // for (let i: number = 0; i < tables.length; i++)
-    // {
-    //     let current_table = tables[i];
-    //     router.get(`/${current_table}`, (req, res) =>
-    //     {
-    //         res.send({ msg: `Get all ${current_table}s` });
-    //         // console.log(`Route created for ${current_table}`);
-    //     });
-    // }
-
-    let promise = new Promise<express.Router>((resolve, reject) =>
-    {
-        resolve(productRouter);
-        reject("error in create_Routers_Promise");
-    });
-
-    return promise;
 }
